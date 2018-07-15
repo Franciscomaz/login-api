@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const config = require('../config/db')[process.env.NODE_ENV];
+const config = require('../database/db')[process.env.NODE_ENV];
 const db = {};
 
 const sequelize = new Sequelize(config.database, config.user, config.password, config);

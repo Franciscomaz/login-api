@@ -3,11 +3,11 @@ const userValidator = require('../validators/usuario');
 
 module.exports = {
     async create(req, res) {
-        userValidator.validar(req.query);
-        await usuarioService.criar(req.query).then(user => {
+        userValidator.validar(req.body);
+        await usuarioService.criar(req.body).then(user => {
             res.send(user);
         }).catch(err => {
-            res.status(500).send({
+            res.status(400).send({
                 error: err
             });
         });
@@ -23,7 +23,7 @@ module.exports = {
         });
     },
     async logar(req, res) {
-        await usuarioService.logar(req.query).then(token => {
+        await usuarioService.logar(req.body).then(token => {
             res.send(token);
         }).catch(err => {
             console.log(err);
@@ -33,7 +33,7 @@ module.exports = {
         });
     },
     async put(req, res) {
-        await await usuarioService.atualizar(req.query).then(user => {
+        await await usuarioService.atualizar(req.body).then(user => {
             res.send(user);
         }).catch(err => {
             console.log(err);
