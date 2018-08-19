@@ -3,9 +3,14 @@ const userValidator = require('../validators/usuario');
 
 module.exports = {
     async create(req, res) {
-        userValidator.validar(req.body);
-        await usuarioService.criar(req.body).then(user => {
-            res.send(user);
+        await userValidator.validar(req.body).then(user => {
+            usuarioService.criar(user).then(user => {
+                res.send(user);
+            }).catch(err => {
+                res.status(500).send({
+                    error: err
+                });
+            });
         }).catch(err => {
             res.status(400).send({
                 error: err

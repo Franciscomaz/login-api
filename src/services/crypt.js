@@ -17,7 +17,7 @@ module.exports = {
             crypt.compare(password, hash, (err, isMatch) => {
                 if (err) reject('Erro na autenticação do usuário.');
                 if (isMatch) resolve();
-                else reject('Senha invalida.');
+                else reject('Senha inválida.');
             })
         });
     }
