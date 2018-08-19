@@ -49,5 +49,15 @@ module.exports = {
                 });
             });
         });
+    },
+    async autenticar(token) {
+        return new Promise((resolve, reject) => {
+            const resutado = sessao.autenticar(token);
+            if(resutado.err) {
+                reject('Falha na autenticação do token.');
+            } else {
+                resolve(resutado.decoded);
+            }
+        })
     }
 };

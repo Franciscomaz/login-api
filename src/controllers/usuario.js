@@ -38,7 +38,7 @@ module.exports = {
         });
     },
     async put(req, res) {
-        await await usuarioService.atualizar(req.body).then(user => {
+        await usuarioService.atualizar(req.body).then(user => {
             res.send(user);
         }).catch(err => {
             console.log(err);
@@ -46,6 +46,16 @@ module.exports = {
                 error: 'Ocorreu um errou ao alterar o registro'
             });
         });
+    },
+    async autenticar(req, res) {
+        console.log(req.param('token'));
+        await usuarioService.autenticar(req.param('token')).then(user => {
+            res.send(user);
+        }).catch(err => {
+            res.status(401).send({
+                status: 401,
+                error: err
+            })
+        })
     }
-
 };
