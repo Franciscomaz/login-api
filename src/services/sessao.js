@@ -8,7 +8,7 @@ module.exports = {
     },
     autenticar: (token) => {
         return jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-            return { err: err, decoded: decoded }
+            return { err: err, decoded: decoded };
         });
     }
 };

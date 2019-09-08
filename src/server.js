@@ -14,8 +14,8 @@ routes(server);
 
 models.sequelize.sync().then(() => {
     server.listen(process.env.PORT, function () {
-        console.log(`Server rodando na porta: ${process.env.PORT}`)
-    })
+        console.log(`Server rodando na porta: ${process.env.PORT}`);
+    });
 });
 
 module.exports = server;

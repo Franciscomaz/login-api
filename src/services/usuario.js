@@ -3,61 +3,58 @@ const sessao = require('../services/sessao');
 const crypt = require('../services/crypt');
 
 module.exports = {
-    async criar(usuario) {
-        return new Promise((resolve, reject) => {
-            this.findByName(usuario).then(user => {
-                console.log(usuario);
-                if (user) reject('Usuário já existe');
-                else resolve(Usuario.create(usuario));
-            }).catch(err => {
-                reject(err);
-            })
-        });
-    },
-    async findByName(user) {
-        return new Promise((resolve, reject) => {
-            resolve(Usuario.find({where: {nome: user.nome}}));
-            reject('Ocorreu um erro ao buscar o registro.');
-        });
+    async criar(user) {
+        const foundUser = await this.findByName(user);
+        
+        if (foundUser) {
+            throw new Error('Usuário já existe');
+        }
+        
+        return Usuario.create(user);
     },
     async findAll() {
-        return new Promise((resolve, reject) => {
-            try {
-                resolve(Usuario.findAll());
-            } catch (err) {
-                reject(err);
+        return Usuario.findAll();
+    },
+    async findByName(user) {
+        return Usuario.find({
+            where: {
+                nome: user.nome
             }
         });
     },
     async atualizar(user) {
-        return new Promise((resolve, reject) => {
-            try {
-                resolve(Usuario.update(user, {where: {id: user.id}}));
-            } catch (err) {
-                reject(err);
+        return Usuario.update(user, {
+            where: {
+                id: user.id
             }
         });
     },
-    async logar(query) {
-        return new Promise((resolve, reject) => {
-            this.findByName(query).then(user => {
-                if (!user) reject('Usuário não encontrado.');
-                crypt.decode(query.senha, user.senha).then(() => {
-                    resolve(sessao.criar(user.dataValues))
-                }).catch(err => {
-                    reject(err);
-                });
-            });
-        });
+    async logar(representation) {
+        try {
+            const entity = await this.findByName(representation.nome);
+
+            if (!entity) {
+                throw new Error(`Usuário ${representation.nome} não encontrado`);
+            }
+
+            if (crypt.matches(representation.senha, entity.senha)) {
+                throw new Error('Senha inválida');
+            }
+
+            return sessao.criar(entity.dataValues);
+        } catch (err) {
+            console.error('Falha no login: ', err);
+            throw new Error(err);
+        }
+
     },
     async autenticar(token) {
-        return new Promise((resolve, reject) => {
-            const resutado = sessao.autenticar(token);
-            if(resutado.err) {
-                reject('Falha na autenticação do token.');
-            } else {
-                resolve(resutado.decoded);
-            }
-        })
+        const resutado = sessao.autenticar(token);
+
+        if (resutado.err) {
+            throw new Error('Falha na autenticação do token');
+        }
+
+        return resutado.decoded;
     }
 };

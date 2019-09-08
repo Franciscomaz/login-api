@@ -3,59 +3,77 @@ const userValidator = require('../validators/usuario');
 
 module.exports = {
     async create(req, res) {
-        await userValidator.validar(req.body).then(user => {
-            usuarioService.criar(user).then(user => {
-                res.send(user);
-            }).catch(err => {
-                res.status(500).send({
-                    error: err
-                });
-            });
-        }).catch(err => {
+        try {
+            userValidator.validar(req.body);
+        } catch (err) {
             res.status(400).send({
                 error: err
             });
-        });
-    },
-    async getAll(req, res) {
-        await usuarioService.findAll().then(users => {
-            res.send(users);
-        }).catch(err => {
-            console.log(err);
-            res.status(500).send({
-                error: 'Ocorreu um erro ao buscar os registros'
-            })
-        });
-    },
-    async logar(req, res) {
-        await usuarioService.logar(req.body).then(token => {
-            res.send(token);
-        }).catch(err => {
-            console.log(err);
+        }
+
+        try {
+            const user = await usuarioService.criar(req.body);
+            res.send(user);
+        } catch (err) {
             res.status(500).send({
                 error: err
-            })
-        });
+            });
+        }
     },
-    async put(req, res) {
-        await usuarioService.atualizar(req.body).then(user => {
+    async getAll(req, res) {
+        try {
+            const users = await usuarioService.findAll();
+            res.send(users);
+        } catch (err) {
+            res.status(500).send({
+                error: 'Ocorreu um erro ao buscar os registros'
+            });
+        }
+    },
+    async logar(req, res) {
+        try {
+            userValidator.validar(req.body);
+        } catch (err) {
+            res.status(400).send({
+                error: err
+            });
+        }
+
+        try {
+            const token = await usuarioService.logar(req.body);
+            res.send(token);
+        } catch (err) {
+            res.status(500).send({
+                error: err
+            });
+        }
+    },
+    async update(req, res) {
+        try {
+            userValidator.validar(req.body);
+        } catch (err) {
+            res.status(400).send({
+                error: err
+            });
+        }
+
+        try {
+            const user = await usuarioService.atualizar(req.body);
             res.send(user);
-        }).catch(err => {
-            console.log(err);
+        } catch (err) {
             res.status(500).send({
                 error: 'Ocorreu um errou ao alterar o registro'
             });
-        });
+        }
     },
     async autenticar(req, res) {
-        console.log(req.param('token'));
-        await usuarioService.autenticar(req.param('token')).then(user => {
+        try {
+            const user = usuarioService.autenticar(req.param('token'));
             res.send(user);
-        }).catch(err => {
+        } catch (err) {
             res.status(401).send({
-                status: 401,
                 error: err
-            })
-        })
+            });
+        }
     }
 };

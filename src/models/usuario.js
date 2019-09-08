@@ -1,6 +1,7 @@
 let crypt = require('../services/crypt');
 
 module.exports = (sequelize, DataTypes) => {
+
     const Usuario = sequelize.define('Usuario', {
         id: {
             type: DataTypes.INTEGER(),
@@ -12,15 +13,18 @@ module.exports = (sequelize, DataTypes) => {
         senha: {type: DataTypes.STRING(100), allowNull: false}
     }, {
         classMethods: {
-            validPassword: crypt.decode
+            validPassword: crypt.matches
         }
     });
-    Usuario.beforeCreate((usuario) => {
-        return crypt.encode(usuario.senha).then(hash => {
-            usuario.senha = hash;
-        }).catch(err => {
-            console.log(err);
-        })
+
+    Usuario.beforeCreate(async usuario => {
+        try {
+            const encodedPassword =  await crypt.encode(usuario.senha);
+            usuario.senha = encodedPassword;
+        } catch(err) {
+            console.log('error: ', err)
+        }
     });
-    return Usuario
+
+    return Usuario;
 };
